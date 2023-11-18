@@ -1,0 +1,23 @@
+<html>
+<head>
+<link   rel="StyleSheet" href="include/cards.css" type="text/css"/>
+<script src="include/jquery-3.7.1.min.js"></script>
+<script src="include/util.js" async defer></script>
+<script src="include/player.js" async defer></script>
+<script src="include/game.js" async defer></script>
+<script src="include/model.js" async defer></script>
+<script src="include/view.js" async defer></script>
+<script src="include/control.js" async defer></script>
+<script>
+$(window).on('load', function() {
+  model   = new KlondikeModel();
+  view    = new KlondikeView();
+  control = new KlondikeController(model, view);
+});
+</script>
+</head>
+<body>
+<div id="content">
+</div>
+</body>
+</html>
