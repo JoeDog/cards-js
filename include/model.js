@@ -217,7 +217,7 @@ class KlondikeModel extends Model {
       var j = 0;
       for (const card of this.piles[i].iterator) {
         if (card.toString() === name) {
-          var okay = false;
+          var okay = true;
           if (this.size(num) == 0 && (num >= 2 && num <= 5)) {
             if (name.startsWith("A")) {
               okay = true;
@@ -283,7 +283,14 @@ class KlondikeModel extends Model {
     return piles.length;
   }
 
-  size(num) {
+  size(num=null) {
+    if (num == null) {
+      let siz = 0;
+      for (let i = 0; i < this.piles.length; i++) {
+        siz += this.piles[i].size();
+      } 
+      return siz;
+    }
     return this.piles[num].size();
   }
 

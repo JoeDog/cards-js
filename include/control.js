@@ -34,6 +34,7 @@ class KlondikeController extends Controller {
   }  
 
   draw(arr=null) {
+    console.log("control.draw");
     if (arr != null) {
       for (let i = 0; i < arr.length; i++) {
         this.view.draw(model.getPile(i));
@@ -46,9 +47,12 @@ class KlondikeController extends Controller {
     this.view.onClick(this.handleMouseClick.bind(this));
     this.view.onDrags(this.handleMouseDrags.bind(this));
     this.view.onDrops(this.handleMouseDrops.bind(this));
+    let imgs = document.getElementsByTagName("img");
+    console.log(imgs.length);
   }
 
   handleMouseClick(id) {
+    console.log("mouseClick");
     model.move(id, 1);
     this.draw([0, 1]); 
     if (model.size(0) == 0) {
@@ -62,16 +66,19 @@ class KlondikeController extends Controller {
   }
 
   handleMouseDrags(event, img, src) {
-    this.draw();
+    console.log("mouseDrags");
+    //this.draw();
   }
 
-  handleMouseDrops(id) {
+  handleMouseDrops(id, evt) {
+    console.log("mouseDrops");
     const arr = id.split(":");
     if (arr.length != 2) return;
     var card  = arr[0];
     var pile  = parseInt(arr[1].replace("pile", ""));
     var res   = model.move(card, pile);
     this.draw();
+    evt.stopImmediatePropagation();
   }
 }
 
