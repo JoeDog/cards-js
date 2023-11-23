@@ -1,16 +1,36 @@
 class Card {
+  static RED   = 1;
+  static BLACK = 2;
+
   constructor (rank, suit, id=-1) {
     if (typeof rank === "object") {
       this.id   = -1;
       this.rank = rank.rank;
       this.suit = suit.suit;
       // XXX: Id???
+    } else if (typeof rank === "string") {
+      var r, s;
+      try {
+        if (rank.length < 2) throw "Malformed card request";
+      } catch(err) {
+        console.log(format("Input: %s; %s", rank, err));
+      }
+      if (rank.length == 3) {
+        r = "10";
+        s = rank.charAt(2);
+      } else {
+        r = rank.charAt(0);
+        s = rank.charAt(1);
+      }
+      this.rank = Regular.rankFromString(r);
+      this.suit = Regular.suitFromString(s);
     } else {
       this.id   = id;
       this.rank = rank;
       this.suit = suit;
     }
     this.counter    = false;
+    this.color      = null;
     this.pile       = -1;
     this.y          = 0;
     this.position   = {x:0, y:0};
@@ -18,7 +38,6 @@ class Card {
     this.base       = "/home/jeff/src/cards-js"
     this.face       = null; // image holder
     this.back       = null; // image holder
-    this.red        = null;
     this.faceup     = false;
     this.selected   = false;
     this.melded     = false;
@@ -99,9 +118,9 @@ class Card {
       this.counter = true;
     }
     if (this.suit == Regular.HEARTS || this.suit == Regular.DIAMONDS) {
-      this.red = true;  
+      this.color = Card.RED;  
     } else {
-      this.red = false;
+      this.color = Card.BLACK;
     }
     if (this.face == null) {
       this.face = new URL(
@@ -147,6 +166,20 @@ class Game {
         return "H";
       case this.DIAMONDS:
         return "D";
+    }
+    return null;
+  }
+
+  static suitFromString(suit) {
+    switch(suit) {
+      case "C":
+        return this.CLUBS;
+      case "S":
+        return this.SPADES;
+      case "H":
+        return this.HEARTS;
+      case "D":
+        return this.DIAMONDS;
     }
     return null;
   }
@@ -342,6 +375,38 @@ class Regular extends Game {
         return "2";
       case this.ACE:
         return "A";
+    }
+    return null;
+  }
+
+  static rankFromString(rank) {
+    switch(rank) {
+      case "K":
+        return this.KING;
+      case "Q":
+        return this.QUEEN;
+      case "J":
+        return this.JACK;
+      case "10": 
+        return this.TEN;
+      case "9":
+        return this.NINE;
+      case "8":
+        return this.EIGHT;
+      case "7":
+        return this.SEVEN;
+      case "6":
+        return this.SIX;
+      case "5":
+        return this.FIVE;
+      case "4":
+        return this.FOUR;
+      case "3":
+        return this.THREE;
+      case "2":
+        return this.TWO;
+      case "A":
+        return this.ACE;
     }
     return null;
   }
