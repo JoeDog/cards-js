@@ -10,6 +10,8 @@ class KlondikeView extends Table {
     this.imgs = null; 
     this.divs = null;
     this.pile = null;
+    this.offx = 0;
+    this.offy = 0;
   }
 
   init(pile, id='content') {
@@ -57,6 +59,9 @@ class KlondikeView extends Table {
         img.style.position = "absolute";
         img.style.left = pos.x+'px';
         img.draggable = true;
+      } else {
+        // the controller may have flipped it
+        img.src = card.getURL();
       }
       if (pile.arrayed) {
         img.style.top  = (pos.y+(20*space))+'px'; 
@@ -72,15 +77,40 @@ class KlondikeView extends Table {
     this.imgs = document.getElementsByTagName("img");
     for (let i = 0; i < this.imgs.length; i++) {
       let id=this.imgs[i].id;
-      this.imgs[i].addEventListener('click', function() {
-        callback(id);
+      this.imgs[i].addEventListener('click', function(event) {
+        event.preventDefault();         
+        event.stopImmediatePropagation();
+        var img  = document.getElementById(id);
+        var pile = parseInt(img.dataset.pile);
+        if (pile == 0) {
+          img.parentNode.removeChild(img);
+          img.style.display='none';
+          callback(id);
+        }
       }, false);
     }
   }
 
   onEmpty(callback) {
-    var div = document.getElementById("pile0");
-    div.addEventListener('click', callback);
+    var div   = document.getElementById("pile0");
+    div.addEventListener('click', function(event) {
+      event.preventDefault();         
+      event.stopImmediatePropagation();
+      this.imgs = document.getElementsByTagName("img");
+      let pack  = [];
+      for (let i = 0; i < this.imgs.length; i++) {
+        var pile = parseInt(this.imgs[i].dataset.pile);
+        if (pile == 1) {
+          pack.push(this.imgs[i]);
+        } 
+      }
+      for (let i = 0; i < pack.length; i++) {
+        let img = pack[i];
+        img.style.display='none';
+        img.parentNode.removeChild(img);
+      }
+      callback(); 
+    }, false);
   }
 
   onDrags(callback) {
@@ -91,8 +121,10 @@ class KlondikeView extends Table {
       var path = this.imgs[i].src;
       var file = path.replace(/^.*[\\\/]/, '');
       if (! file.includes("back")) {
-        let id=this.imgs[i].id;
+        let id   = this.imgs[i].id;
+        this.pile = parseInt(this.imgs[i].dataset.pile) || 0;
         this.imgs[i].addEventListener('dragstart', function(event) {
+          console.log("dragstart:"+id);
           event.dataTransfer.dropEffect = 'move';
           event.dataTransfer.setData("text/plain", id);
         }, false);
@@ -104,6 +136,7 @@ class KlondikeView extends Table {
     console.log("onDrops");
     this.divs = document.getElementsByTagName("div");
     this.imgs = document.getElementsByTagName("img");
+    console.log("THIS.PILE:"+this.pile);
     for (let i = 0; i < this.divs.length; i++) { 
       let id = this.divs[i].id;
       if (id.includes("pile")) { // we only want piles
