@@ -34,7 +34,6 @@ class KlondikeController extends Controller {
   }  
 
   draw(arr=null) {
-    console.log("control.draw");
     if (arr != null) {
       for (let i = 0; i < arr.length; i++) {
         this.view.draw(model.getPile(i));
@@ -53,7 +52,7 @@ class KlondikeController extends Controller {
 
   handleMouseClick(id) {
     console.log("mouseClick");
-    model.move(id, 1);
+    model.flip(id);
     this.draw([0, 1]); 
     if (model.size(0) == 0) {
       this.view.onEmpty(this.handleEmptyClick.bind(this));
@@ -67,7 +66,6 @@ class KlondikeController extends Controller {
 
   handleMouseDrags(event, img, src) {
     console.log("mouseDrags");
-    //this.draw();
   }
 
   handleMouseDrops(id, evt) {
