@@ -211,19 +211,45 @@ class KlondikeModel extends Model {
     this.piles[num].add(card);
   }
 
+  show(num) {
+    let s = "pile:"+num+" ";
+    for (const card of this.piles[num].iterator) {
+      s = s+card.toString()+" ";
+    }
+    console.log(s);
+  }
+
+  flip(name) {
+    console.log(name);
+    let card = this.piles[0].remove(this.piles[0].size()-1);
+    card.setFaceUp();
+    card.setPile(1);
+    this.add(1, card);
+  }
+
+
   move(name, num) {
     console.log("move("+name+", "+num+")");
     for (let i = 0; i < this.piles.length; i++) {
       var j = 0;
       for (const card of this.piles[i].iterator) {
         if (card.toString() === name) {
-          var okay = true;
+          console.log(format("%s === %s", card.toString(), name)); 
+          var okay = false;
           if (this.size(num) == 0 && (num >= 2 && num <= 5)) {
             if (name.startsWith("A")) {
               okay = true;
             }  
           }
-          if (num == 1) okay = true;
+          if (num >= 6) {
+            let tmp = new Card(name);
+            let crd = this.piles[num].peek();
+            if (crd == null && name.startsWith("K")) {
+              okay = true;
+            } else {
+              okay = (tmp.rank == crd.rank-1 && tmp.color != crd.color) ? true : false;
+            }
+          }
           if (okay) {
             var tmp = this.piles[i].remove(j);
             tmp.setFaceUp();
