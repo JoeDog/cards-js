@@ -12,8 +12,10 @@ class KlondikeView extends Table {
     this.pile = null;
     this.offx = 0;
     this.offy = 0;
+    this.drag = false;
   }
 
+  /**************************************************
   init(pile, id='content') {
     var test = document.getElementById(pile.div.id);
     if (test = null) { 
@@ -39,11 +41,18 @@ class KlondikeView extends Table {
       space++;
     }
   }
+  **************************************************/
+
+  remove(id) {
+    var img   = document.getElementById(id);
+    if (img != null) {
+      img.style.display='none';
+      img.parentNode.removeChild(img);
+    }
+  }
 
   draw(pile, id="content") {
-    console.log("draw");
     if (document.getElementById(pile.div.id) == null) {
-      console.log("append");
       document.getElementById(id).appendChild(pile.div);
     }
     var space = 0; 
@@ -114,8 +123,6 @@ class KlondikeView extends Table {
   }
 
   onDrags(callback) {
-    console.log("onDrags");
-    // On drag start
     this.imgs = document.getElementsByTagName("img");
     for (let i = 0; i < this.imgs.length; i++) {
       var path = this.imgs[i].src;
@@ -124,23 +131,60 @@ class KlondikeView extends Table {
         let id   = this.imgs[i].id;
         this.pile = parseInt(this.imgs[i].dataset.pile) || 0;
         this.imgs[i].addEventListener('dragstart', function(event) {
-          console.log("dragstart:"+id);
+          this.offx = event.clientX - this.getBoundingClientRect().left;
+          this.offy = event.clientY - this.getBoundingClientRect().top;
+          this.drag = true;
+          //console.log("pile:"+this.dataset.pile);
+          //console.log("this.pile:"+this.pile);
           event.dataTransfer.dropEffect = 'move';
           event.dataTransfer.setData("text/plain", id);
+          event.stopImmediatePropagation();
         }, false);
       }
     }
+  }
+
+
+  onMoves(callback, stacks) {
+    this.imgs = document.getElementsByTagName("img");
+    for (let i = 0; i < this.imgs.length; i++) {
+      var path = this.imgs[i].src;
+      var file = path.replace(/^.*[\\\/]/, '');
+      if (! file.includes("back")) {
+        var pile = "pile"+this.imgs[i].dataset.pile;
+        this.imgs[i].addEventListener('drag', function(event) {
+          const x = event.clientX - this.offx;
+          const y = event.clientY - this.offy;
+          var ims = [];
+          if (stacks != null && stacks[pile] != null) {
+            for (let j = 0; j < stacks[pile].length; j++) {
+              ims.push(stacks[pile][j]);
+            }
+          }
+          /*for (let j = 0; j < ims.length; j++) {
+            var png = document.getElementById(ims[j]);
+            png.style.left = x+"px"; 
+            png.style.top  = y+(10*j)+"px";
+          }*/
+          /*img1.style.left = x + 'px';
+          img1.style.top = y + 'px';
+          img2.style.left = x + 'px';
+          img2.style.top = y + 10 + 'px';*/
+          event.stopImmediatePropagation();
+        }, false);
+      }
+    } 
   }
 
   onDrops(callback) {
     console.log("onDrops");
     this.divs = document.getElementsByTagName("div");
     this.imgs = document.getElementsByTagName("img");
-    console.log("THIS.PILE:"+this.pile);
     for (let i = 0; i < this.divs.length; i++) { 
       let id = this.divs[i].id;
       if (id.includes("pile")) { // we only want piles
         this.divs[i].addEventListener('drop', function(event) {
+          this.drag = false;
           var card = event.dataTransfer.getData("text/plain");
           event.preventDefault();         
           var img   = document.getElementById(card);
@@ -155,7 +199,7 @@ class KlondikeView extends Table {
     for (let i = 0; i < this.imgs.length; i++) { 
       let img  = this.imgs[i];
       let pile = parseInt(img.dataset.pile) || 0;
-      if (! img.src.includes("back") && pile > 2) {
+      if (! img.src.includes("back") && pile >= 2) {
         img.addEventListener('drop', function(event) {
           var card = event.dataTransfer.getData("text/plain");
           console.log("img.evt: "+this.pile);
