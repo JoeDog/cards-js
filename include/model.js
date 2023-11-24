@@ -220,13 +220,11 @@ class KlondikeModel extends Model {
   }
 
   flip(name) {
-    console.log(name);
     let card = this.piles[0].remove(this.piles[0].size()-1);
     card.setFaceUp();
     card.setPile(1);
     this.add(1, card);
   }
-
 
   move(name, num) {
     console.log("move("+name+", "+num+")");
@@ -234,12 +232,15 @@ class KlondikeModel extends Model {
       var j = 0;
       for (const card of this.piles[i].iterator) {
         if (card.toString() === name) {
-          console.log(format("%s === %s", card.toString(), name)); 
+          console.log("match");
           var okay = false;
-          if (this.size(num) == 0 && (num >= 2 && num <= 5)) {
-            if (name.startsWith("A")) {
+          if (num >= 2 && num <= 5) {
+            if (this.size(num) == 0 && name.startsWith("A")) {
               okay = true;
-            }  
+            } else {
+              let crd = this.piles[num].peek();
+              okay = (crd.suit == card.suit && crd.rank+1 == card.rank) ? true : false;
+            }
           }
           if (num >= 6) {
             let tmp = new Card(name);
@@ -250,6 +251,7 @@ class KlondikeModel extends Model {
               okay = (tmp.rank == crd.rank-1 && tmp.color != crd.color) ? true : false;
             }
           }
+          console.log("okay: "+okay);
           if (okay) {
             var tmp = this.piles[i].remove(j);
             tmp.setFaceUp();
@@ -259,7 +261,7 @@ class KlondikeModel extends Model {
               var crd = this.piles[i].peek();
               if (crd != null) crd.setFaceUp();
             }
-          }
+          } 
         }
         j++;
       }
@@ -278,7 +280,6 @@ class KlondikeModel extends Model {
   createPiles() {
     for (let i = 0; i < 13; i++) {
       var pile = new Pile(i); 
-      pile.setContent(i);
       switch(i) {
         case 0:
           pile.setTop(this.tmar);
@@ -309,6 +310,27 @@ class KlondikeModel extends Model {
     return piles.length;
   }
 
+  stacks() {
+    var stacks = {
+      "pile6":  [],
+      "pile7":  [],
+      "pile8":  [],
+      "pile9":  [],
+      "pile10": [],
+      "pile11": [],
+      "pile12": [],
+    }
+    for (let i = 6; i < this.piles.length; i++) {
+      var key = "pile"+i;
+      for (const card of this.piles[i].iterator) {
+        if (card.isFaceUp()) {
+          stacks[key].push(card.toString());
+        }
+      }
+    }
+    return stacks;
+  }
+
   size(num=null) {
     if (num == null) {
       let siz = 0;
@@ -318,6 +340,21 @@ class KlondikeModel extends Model {
       return siz;
     }
     return this.piles[num].size();
+  }
+
+  whence(name) {
+    for (let i = 0; i < this.piles.length; i++) {
+      console.log(i);
+      for (let j = 0; j < this.piles[i].size(); j++) {
+        console.log(j);
+        var card = this.piles[i].get(j);
+        console.log("whence:"+card.toString());
+        if (card.toString() === name) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 
   getPile(num) {
