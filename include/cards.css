@@ -18,7 +18,11 @@
  left:5px;
 }
 
-body {
+.no-drop-cursor {
+  cursor: none !important;
+}
+
+#bodyId {
   background-size: cover;
   background-repeat: no-repeat;
   background-image: url('./images/background.jpg');
