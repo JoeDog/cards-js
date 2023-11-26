@@ -1,5 +1,16 @@
 const format = (...args) => args.shift().replace(/%([jsd])/g, x => x === '%j' ? JSON.stringify(args.shift()) : args.shift())
 
+class Util {
+  static indexOf(arr, obj) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].id === obj.id) {
+        return i;
+      }
+    }
+    return 0;
+  }
+}
+
 class Stack {
   constructor() {
     this.items = [];
