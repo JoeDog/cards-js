@@ -48,11 +48,9 @@ class KlondikeController extends Controller {
     this.view.onDrops(this.handleMouseDrops.bind(this));
     this.view.onMoves(this.handleMouseMoves.bind(this), this.model.stacks());
     let imgs = document.getElementsByTagName("img");
-    console.log(imgs.length);
   }
 
   handleMouseClick(id) {
-    console.log("mouseClick");
     model.flip(id);
     this.draw([0, 1]); 
     if (model.size(0) == 0) {
@@ -66,15 +64,12 @@ class KlondikeController extends Controller {
   }
 
   handleMouseDrags(event, img, src) {
-    console.log("mouseDrags");
   }
 
   handleMouseMoves(img) {
-    console.log("moiving this: "+img);
   }
 
   handleMouseDrops(id, evt) {
-    console.log("mouseDrops");
     const arr = id.split(":");
     if (arr.length != 2) return;
     var indx  = 0;

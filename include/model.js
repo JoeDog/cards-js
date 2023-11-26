@@ -24,7 +24,6 @@ class Pile extends Stack {
   add(card) {
     super.add(card);
     if (this.stacked) {
-      console.log(format("add %s", card.toString()));
       card.setPosition(this.coords.x, this.coords.y);
     } else {
       var x = this.coords.x;
@@ -96,7 +95,6 @@ class Hand {
     } else if (card instanceof Card == true) {
       // find total by card
       for (let i = 0; i < this.items.length; i++) {
-        console.log(format("%s => %s", card.toString(), this.items[i].toString()));
         if (card.matches(this.items[i])) {
           num++;
         }
@@ -143,7 +141,6 @@ class Deck extends Stack {
     } else if (card instanceof Card == true) {
       // find total by card
       for (let i = 0; i < this.items.length; i++) {
-        console.log(format("%s => %s", card.toString(), this.items[i].toString()));
         if (card.matches(this.items[i])) {  
           num++;
         }
@@ -232,14 +229,15 @@ class KlondikeModel extends Model {
       var j = 0;
       for (const card of this.piles[i].iterator) {
         if (card.toString() === name) {
-          console.log("match");
           var okay = false;
           if (num >= 2 && num <= 5) {
             if (this.size(num) == 0 && name.startsWith("A")) {
               okay = true;
             } else {
               let crd = this.piles[num].peek();
-              okay = (crd.suit == card.suit && crd.rank+1 == card.rank) ? true : false;
+              if (crd != null && card != null) {
+                okay = (crd.suit == card.suit && crd.rank+1 == card.rank) ? true : false;
+              }
             }
           }
           if (num >= 6) {
@@ -247,11 +245,13 @@ class KlondikeModel extends Model {
             let crd = this.piles[num].peek();
             if (crd == null && name.startsWith("K")) {
               okay = true;
+            } else if (crd == null) {
+              // A non-King was placed on an empty square. Not okay.
+              okay = false;
             } else {
               okay = (tmp.rank == crd.rank-1 && tmp.color != crd.color) ? true : false;
             }
           }
-          console.log("okay: "+okay);
           if (okay) {
             var tmp = this.piles[i].remove(j);
             tmp.setFaceUp();
@@ -344,11 +344,8 @@ class KlondikeModel extends Model {
 
   whence(name) {
     for (let i = 0; i < this.piles.length; i++) {
-      console.log(i);
       for (let j = 0; j < this.piles[i].size(); j++) {
-        console.log(j);
         var card = this.piles[i].get(j);
-        console.log("whence:"+card.toString());
         if (card.toString() === name) {
           return i;
         }
