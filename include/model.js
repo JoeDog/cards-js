@@ -179,13 +179,12 @@ class Model {
   }
 }
 
-class KlondikeModel extends Model {
+class SolitaireModel extends Model {
   constructor() {
     super();
     this.tmar = 20;
     this.lmar = 20;
     this.iterator = this.pileIterator();
-    this.createPiles();
   }
 
   *pileIterator() {
@@ -196,16 +195,23 @@ class KlondikeModel extends Model {
     return;
   }
 
-  setArrayedPiles(arr) {
-    for (let i = 0; i < arr.length; i++) {
-      this.piles[arr[i]].setArrayed(true);
-    }
+  flip(name) {
+    let card = this.piles[0].remove(this.piles[0].size()-1);
+    card.setFaceUp();
+    card.setPile(1);
+    this.add(1, card);
   }
 
   add(num, card) {
     if (num < 0 || num > this.piles.length) return;
     card.setPile(num);
     this.piles[num].add(card);
+  }
+
+  setArrayedPiles(arr) {
+    for (let i = 0; i < arr.length; i++) {
+      this.piles[arr[i]].setArrayed(true);
+    }
   }
 
   show(num) {
@@ -216,11 +222,94 @@ class KlondikeModel extends Model {
     console.log(s);
   }
 
-  flip(name) {
-    let card = this.piles[0].remove(this.piles[0].size()-1);
-    card.setFaceUp();
-    card.setPile(1);
-    this.add(1, card);
+  piles() {
+    return piles.length;
+  }
+
+  getPile(num) {
+    return this.piles[num];
+  }
+
+  getPiles() {
+    return this.piles;
+  }
+}
+
+class CanfieldModel extends SolitaireModel {
+  constructor() {
+    super();
+    this.createPiles();
+  }
+
+  createPiles() {
+    for (let i = 0; i < 11; i++) {
+      var pile = new Pile(i);
+      switch(i) {
+        case 0:
+          pile.setTop(this.tmar);
+          pile.setLeft(this.lmar);
+          break;
+        case 2:
+          this.lmar += 212;
+          pile.setTop(this.tmar);
+          pile.setLeft(this.lmar);
+          break;
+        case  6:
+          this.tmar += 170;
+          this.lmar = 126;
+          pile.setTop(this.tmar);
+          pile.setLeft(this.lmar);
+          break;
+        case  7:
+          this.lmar += 212;
+          pile.setTop(this.tmar);
+          pile.setLeft(this.lmar);
+          break;
+        default:
+          this.lmar += 106;
+          pile.setTop(this.tmar);
+          pile.setLeft(this.lmar);
+          break;
+      }
+      this.piles.push(pile);
+    }
+  }
+
+  stacks() {
+    var stacks = {
+      "pile7":  [],
+      "pile8":  [],
+      "pile9":  [],
+      "pile10": [],
+    }
+    for (let i = 7; i < this.piles.length; i++) {
+      var key = "pile"+i;
+      for (const card of this.piles[i].iterator) {
+        if (card.isFaceUp()) {
+          stacks[key].push(card.toString());
+        }
+      }
+    }
+    return stacks;
+  }
+
+  whence(name) {
+    for (let i = 0; i < this.piles.length; i++) {
+      for (let j = 0; j < this.piles[i].size(); j++) {
+        var card = this.piles[i].get(j);
+        if (card.toString() === name) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+}
+
+class KlondikeModel extends SolitaireModel {
+  constructor() {
+    super();
+    this.createPiles();
   }
 
   move(name, num) {
@@ -306,10 +395,6 @@ class KlondikeModel extends Model {
     }
   }
 
-  piles() {
-    return piles.length;
-  }
-
   stacks() {
     var stacks = {
       "pile6":  [],
@@ -352,13 +437,5 @@ class KlondikeModel extends Model {
       }
     }
     return -1;
-  }
-
-  getPile(num) {
-    return this.piles[num];
-  }
-
-  getPiles() {
-    return this.piles;
   }
 }
