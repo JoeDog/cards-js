@@ -35,7 +35,7 @@ class Card {
     this.y          = 0;
     this.position   = {x:0, y:0};
     this.status     = 0;
-    this.base       = "/home/jeff/src/cards-js"
+    this.base       = "include/images/cards"
     this.face       = null; // image holder
     this.back       = null; // image holder
     this.faceup     = false;
@@ -123,12 +123,10 @@ class Card {
       this.color = Card.BLACK;
     }
     if (this.face == null) {
-      this.face = new URL(
-        format("file://%s/include/images/cards/%s%s.png", this.base, Regular.rank(this.rank), Regular.suit(this.suit))
-      );
+      this.face = format("%s/%s%s.png", this.base, Regular.rank(this.rank), Regular.suit(this.suit));
     }
     if (this.back == null) {
-      this.back = new URL(format("file://%s/include/images/cards/back.png", this.base));
+      this.back = format("%s/back.png", this.base);
     }
   }
 }
