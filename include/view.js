@@ -3,7 +3,6 @@ class Table {
   }
 
   remove(id) {
-    console.log("remove fired");
     var img   = document.getElementById(id);
     if (img != null) {
       img.style.display='none';
@@ -23,15 +22,6 @@ class KlondikeView extends Table {
     this.drag = false;
     this.pngs = new Array(13);
   }
-
-  /**
-  remove(id) {
-    var img   = document.getElementById(id);
-    if (img != null) {
-      img.style.display='none';
-      img.parentNode.removeChild(img);
-    }
-  }*/
 
   draw(pile, id="content") {
     if (document.getElementById(pile.div.id) == null) {
@@ -71,6 +61,13 @@ class KlondikeView extends Table {
           }
         }
       }
+    }
+  }
+
+  show() {
+    this.divs = document.getElementsByTagName("div");
+    for (let i = 0; i < this.divs.length; i++) { 
+      console.log(this.divs[i]);
     }
   }
 
