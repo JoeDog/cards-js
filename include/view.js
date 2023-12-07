@@ -11,7 +11,7 @@ class Table {
   }
 }
 
-class KlondikeView extends Table {
+class SolitaireView extends Table {
   constructor() {
     super();
     this.imgs = null; 
@@ -202,6 +202,7 @@ class KlondikeView extends Table {
      * The bdy listeners handle bad drops. Unfortunately,
      * this means the cursor displays copy over bdy element
      */
+    /*****************************************************
     var bdy = document.getElementById("bodyId");
     bdy.addEventListener('dragover', function(event) {
       event.preventDefault();
@@ -223,5 +224,20 @@ class KlondikeView extends Table {
       }
       event.stopImmediatePropagation();
     }, false);
+    *****************************************************/
   }
 }
+
+class CanfieldView extends SolitaireView {
+  constructor() {
+    super();
+  }
+}
+
+class KlondikeView extends SolitaireView {
+  constructor() {
+    super();
+  }
+}
+
+
