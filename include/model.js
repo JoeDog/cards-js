@@ -66,8 +66,8 @@ class Pile extends Stack {
       
   where() {
     var rect = this.div.getBoundingClientRect();
-    this.coords.x = rect.left;
-    this.coords.y = rect.top;
+    this.coords.x = Math.trunc(rect.left);
+    this.coords.y = Math.trunc(rect.top);
     return this.coords;
   }
 }
