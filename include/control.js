@@ -8,6 +8,38 @@ class Controller {
 class SolitaireController extends Controller {
   constructor(model, view) {
     super(model, view);
+    this.addListeners(this.draw.bind(this), this.remove.bind(this));
+  }
+
+  addListeners(draw, remove) {
+    var dropzoneId = "bodyId";
+    window.addEventListener("dragover", function(e) {
+      if (e.target.id == dropzoneId) {
+        e.preventDefault();
+        e.dataTransfer.effectAllowed = "all";
+      }
+    });
+    window.addEventListener("drop", function(e) {
+      if (e.target.id == dropzoneId) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.dataTransfer.effectAllowed = "none";
+        e.dataTransfer.dropEffect = "none";
+        var pit = null;
+        var bdy = document.getElementById(dropzoneId);
+        var img = bdy.getElementsByTagName("img");
+        for (let i = 0; i < img.length; i++) {
+          if (img[i].nextElementSibling==null) {
+            remove(img[i]);
+          }
+        }
+        draw();
+      }
+    });
+  }
+
+  remove(id) {
+    this.view.remove(id);
   }
 
   handleMouseClick(id) {
