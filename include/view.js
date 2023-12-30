@@ -5,8 +5,8 @@ class Table {
   remove(id) {
     var img   = document.getElementById(id);
     if (img != null) {
-      img.style.display='none';
       img.parentNode.removeChild(img);
+      img.style.display='none';
     }
   }
 }
@@ -19,11 +19,11 @@ class SolitaireView extends Table {
     this.pile = null;
     this.offx = 0;
     this.offy = 0;
-    this.drag = false;
     this.pngs = new Array(13);
   }
 
   draw(pile, id="content") {
+    let redraw = false;
     if (document.getElementById(pile.div.id) == null) {
       document.getElementById(id).appendChild(pile.div);
     }
@@ -31,7 +31,9 @@ class SolitaireView extends Table {
     for (const card of pile.iterator) {
       var pos = pile.where();
       var img = document.getElementById(card.toString());
-      if (img == null) {
+      if (img != null) {
+        img.src = card.getURL();
+      } else {
         img = document.createElement("img"); 
         img.src = card.getURL();
         img.id  = card.toString(); //+":"+pile.id;
@@ -40,8 +42,6 @@ class SolitaireView extends Table {
         img.style.position = "absolute";
         img.style.left = pos.x+'px';
         img.draggable = true;
-      } else {
-        img.src = card.getURL();
       }
       if (pile.arrayed) {
         img.style.top  = (pos.y+(20*space))+'px'; 
@@ -62,6 +62,7 @@ class SolitaireView extends Table {
         }
       }
     }
+    if (redraw) this.draw(pile);
   }
 
   show() {
@@ -73,6 +74,7 @@ class SolitaireView extends Table {
 
   onClick(callback) {
     this.imgs = document.getElementsByTagName("img");
+    var tmp   = this.pngs;
     for (let i = 0; i < this.imgs.length; i++) {
       let id=this.imgs[i].id;
       this.imgs[i].addEventListener('click', function(event) {
@@ -122,7 +124,7 @@ class SolitaireView extends Table {
         this.imgs[i].addEventListener('dragstart', function(event) {
           this.offx = event.clientX - this.getBoundingClientRect().left;
           this.offy = event.clientY - this.getBoundingClientRect().top;
-          this.drag = true;
+          event.dataTransfer.effectAllowed = "all";  //XXX
           event.dataTransfer.dropEffect = 'move';
           event.dataTransfer.setData("text/plain", id);
           event.stopImmediatePropagation();
@@ -148,6 +150,7 @@ class SolitaireView extends Table {
             if (png != null) {
               png.style.left = x+"px"; 
               png.style.top  = y+(10*j)+"px";
+              png.position   = "absolute";
             }
           }
           event.stopImmediatePropagation();
@@ -157,6 +160,39 @@ class SolitaireView extends Table {
   }
 
   onDrops(callback) {
+    document.querySelector('html').addEventListener('drop', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      //var evt = document.createEvent("MouseEvents");
+      //evt.initEvent("mouseup", true, true);
+      //document.getElementById('drag-me').dispatchEvent(evt);
+    });
+    document.querySelector('html').addEventListener('drag', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    });
+    document.querySelector('html').addEventListener('dragenter', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    });
+    document.querySelector('html').addEventListener('dragstart', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    });
+    document.querySelector('html').addEventListener('dragend', function (e) {
+      let target = e.target || e.srcElement;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      callback(target.id+":"+target.dataset.pile, event);
+    });
+    document.querySelector('html').addEventListener('dragover', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    });
+    document.querySelector('html').addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    });
     this.divs = document.getElementsByTagName("div");
     this.imgs = document.getElementsByTagName("img");
     for (let i = 0; i < this.divs.length; i++) { 
@@ -197,34 +233,6 @@ class SolitaireView extends Table {
         }, false);
       }    
     }
-    /**
-     * FIX ME: XXX
-     * The bdy listeners handle bad drops. Unfortunately,
-     * this means the cursor displays copy over bdy element
-     */
-    /*****************************************************
-    var bdy = document.getElementById("bodyId");
-    bdy.addEventListener('dragover', function(event) {
-      event.preventDefault();
-      document.body.style.cursor = 'auto';
-    });
-    bdy.addEventListener('dragleave', function(event) {
-      event.preventDefault();
-      document.body.style.cursor = 'auto';
-    });
-    bdy.addEventListener('drop', function(event) {
-      document.body.style.cursor = 'auto';
-      event.preventDefault();
-      var card = event.dataTransfer.getData("text/plain");
-      var img  = document.getElementById(card);
-      if (img != null) {
-        img.parentNode.removeChild(img);
-        img.style.display='none';
-        callback(card+":"+this.pile, event);
-      }
-      event.stopImmediatePropagation();
-    }, false);
-    *****************************************************/
   }
 }
 
