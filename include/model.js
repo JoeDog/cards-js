@@ -214,6 +214,10 @@ class SolitaireModel extends Model {
     }
   }
 
+  get(num) {
+    return this.piles[num].peek();
+  }
+
   show(num) {
     let s = "pile:"+num+" ";
     for (const card of this.piles[num].iterator) {
@@ -233,12 +237,105 @@ class SolitaireModel extends Model {
   getPiles() {
     return this.piles;
   }
+
+  size(num=null) {
+    if (num == null) {
+      let siz = 0;
+      for (let i = 0; i < this.piles.length; i++) {
+        siz += this.piles[i].size();
+      } 
+      return siz;
+    }
+    return this.piles[num].size();
+  }
+
+  whence(name) {
+    for (let i = 0; i < this.piles.length; i++) {
+      for (let j = 0; j < this.piles[i].size(); j++) {
+        var card = this.piles[i].get(j);
+        if (card.toString() === name) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+  
+  reset() {
+    this.iterator = this.pileIterator();
+  }
+
+  restack(src, dst) {
+    if (src == dst) return; //WTF??
+    while(this.piles[src].size() > 0) {
+      var tmp = this.piles[src].pop();
+      tmp.setFaceDown();
+      this.add(dst, tmp); //XXX: the pile number is set in add(n, card)
+    }
+  }
 }
 
 class CanfieldModel extends SolitaireModel {
   constructor() {
     super();
     this.createPiles();
+    this.base = "";
+  }
+
+  setBase(card) {
+    let  str  = card.toString();
+    this.base = str.replace(/.$/, "");
+  }
+
+  move(name, num) {
+    console.log("move('"+name+"', "+num+")");
+    for (let i = 0; i < this.piles.length; i++) {
+      var j = 0;
+      for (const card of this.piles[i].iterator) {
+        if (card.toString() === name) {
+          var okay = false;
+          if (num >= 2 && num <= 5) {
+            if (this.size(num) == 0 && name.startsWith(this.base)) {
+              okay = true;
+            } else {
+              let crd = this.piles[num].peek();
+              if (crd != null && card != null) {
+                //okay = (crd.suit == card.suit && crd.rank+1 == card.rank) ? true : false;
+                if (crd.suit == card.suit && crd.rank+1 == card.rank) {
+                  okay = true;
+                } else if (crd.suit == card.suit && crd.rank == Regular.KING && card.rank == Regular.ACE) {
+                  okay = true;
+                }
+              }
+            }
+          }
+          if (num > 6) {
+            if (this.size(num) == 0) {
+              okay = true;
+            } else {
+              let tmp = new Card(name);
+              let crd = this.piles[num].peek();
+              okay = (tmp.rank == crd.rank-1 && tmp.color != crd.color) ? true : false;
+              if (crd.rank == Regular.ACE && tmp.rank == Regular.KING) {
+                okay = (crd.color != tmp.color) ? true : false;
+              }
+            }
+          }
+          if (okay) {
+            var tmp = this.piles[i].remove(j);
+            tmp.setFaceUp();
+            tmp.setPile(num);
+            this.add(num, tmp);
+            if (i > 5) {
+              var crd = this.piles[i].peek();
+              if (crd != null) crd.setFaceUp();
+            }
+          }
+        }
+        j++;
+      }
+    }
+    return okay;
   }
 
   createPiles() {
@@ -291,18 +388,6 @@ class CanfieldModel extends SolitaireModel {
       }
     }
     return stacks;
-  }
-
-  whence(name) {
-    for (let i = 0; i < this.piles.length; i++) {
-      for (let j = 0; j < this.piles[i].size(); j++) {
-        var card = this.piles[i].get(j);
-        if (card.toString() === name) {
-          return i;
-        }
-      }
-    }
-    return -1;
   }
 }
 
@@ -357,14 +442,14 @@ class KlondikeModel extends SolitaireModel {
     }
   }
 
-  restack(src, dst) {
+  /*restack(src, dst) {
     if (src == dst) return; //WTF??
     while(this.piles[src].size() > 0) {
       var tmp = this.piles[src].pop();
       tmp.setFaceDown();
       this.add(dst, tmp); //XXX: the pile number is set in add(n, card)
     }
-  }
+  }*/
 
   createPiles() {
     for (let i = 0; i < 13; i++) {
@@ -416,6 +501,7 @@ class KlondikeModel extends SolitaireModel {
     return stacks;
   }
 
+  /******************************************************
   size(num=null) {
     if (num == null) {
       let siz = 0;
@@ -438,4 +524,5 @@ class KlondikeModel extends SolitaireModel {
     }
     return -1;
   }
+  ******************************************************/
 }
