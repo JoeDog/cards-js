@@ -23,7 +23,6 @@ class SolitaireView extends Table {
   }
 
   draw(pile, id="content") {
-    let redraw = false;
     if (document.getElementById(pile.div.id) == null) {
       document.getElementById(id).appendChild(pile.div);
     }
@@ -62,7 +61,6 @@ class SolitaireView extends Table {
         }
       }
     }
-    if (redraw) this.draw(pile);
   }
 
   show() {
