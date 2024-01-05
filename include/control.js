@@ -69,7 +69,7 @@ class SolitaireController extends Controller {
     var card  = arr[0];
     var from  = "pile"+model.whence(card);
     var pile  = parseInt(arr[1].replace("pile", ""));
-    var res = model.move(card, pile);
+    var res   = model.move(card, pile);
     this.draw();
     if (hand[from] != null) {
       for (let i = 0; i < hand[from].length; i++) {
@@ -85,7 +85,7 @@ class SolitaireController extends Controller {
 class CanfieldController extends SolitaireController {
   constructor(model, view) {
     super(model, view);
-    this.model.setArrayedPiles([5,6,7,8,9]);
+    this.model.setArrayedPiles([6,7,8,9,10]);
     var deck = new Deck(Game.REGULAR);
     var ones = [2, 7, 8, 9, 10];
 
@@ -94,6 +94,7 @@ class CanfieldController extends SolitaireController {
       var card = deck.pop();
       card.setFaceUp();
       this.model.add(ones[i], card);
+      if (ones[i] == 2) model.setBase(card);
     }
     for (let i = 0; i < 13; i++) {
       var card = deck.pop();
@@ -104,7 +105,9 @@ class CanfieldController extends SolitaireController {
       }
       this.model.add(6, card);
     }
-    for (let i = 0; i < deck.size(); i++) {
+
+    let len = deck.size();
+    for (let i = 0; i < len; i++) {
       var card = deck.pop();
       card.setFaceDown();
       this.model.add(0, card);
@@ -127,6 +130,21 @@ class CanfieldController extends SolitaireController {
     this.view.onDrops(this.handleMouseDrops.bind(this));
     this.view.onMoves(this.handleMouseMoves.bind(this), this.model.stacks());
     let imgs = document.getElementsByTagName("img");
+    let pile = model.getPile(6);
+    if (pile.size() > 0) {
+      /**
+       * If any of piles 7 thru 10 are empty we'll
+       * automatically move a card from the flop
+       */
+      for (let i = 7; i < 11; i++) {
+        if ((model.getPile(i)).size() == 0) {
+          let tmp = pile.peek();
+          model.move(tmp.toString(), i);
+          view.remove(tmp.toString());
+          this.draw();
+        }
+      }
+    }
   }
 }
 
