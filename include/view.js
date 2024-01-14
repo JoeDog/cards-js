@@ -143,12 +143,14 @@ class SolitaireView extends Table {
           const y = event.clientY - this.offy;
           const p = parseInt(this.dataset.pile);
           const z = Util.indexOf(tmp[p], this);
+          this.zIndex = 0;
           for (let j = z+1; j < tmp[p].length; j++) {
             var png = tmp[p][j];
             if (png != null) {
               png.style.left = x+"px"; 
               png.style.top  = y+(10*j)+"px";
               png.position   = "absolute";
+              png.zIndex     = "+"+j;
             }
           }
           event.stopImmediatePropagation();
@@ -202,7 +204,7 @@ class SolitaireView extends Table {
           var card = event.dataTransfer.getData("text/plain");
           var img  = document.getElementById(card);
           img.parentNode.removeChild(img);
-          callback(card+":"+id, event);
+          callback(card+":"+event.target.id, event);
         }, false);
         this.divs[i].addEventListener('dragover', function(event) {
           event.dataTransfer.dropEffect = 'copy';
